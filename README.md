@@ -58,7 +58,7 @@ Our self-service on-prem license allows 1-to-3 running instances, each of which 
 
 Our intent with multiple instances is to allow customers to run instances in different environments/contexts (e.g. dev, stage, production).
 
-If you need increased concurrency across multiple GPUs, contact us regarding a custom contract at [support@datalab.to](mailto:support@datalab.to). Different images and deployment instructions are also required for such a set up.
+If you need concurrency across > 1 GPU, contact us regarding a custom contract at [support@datalab.to](mailto:support@datalab.to). In addition to a new license, different images and deployment instructions are also required for such a set up.
 
 # Recommended GPUs
 
