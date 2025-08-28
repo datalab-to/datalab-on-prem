@@ -18,7 +18,7 @@ If you need help troubleshooting or have questions, please reach out to [support
 
 You can run the container by logging into your VM and running the below:
 
-```
+```bash
 export DATALAB_LICENSE_KEY=your-license-key
 export SERVICE_ACCOUNT_KEY_FILE=path/to/key.json
 ./run-datalab-inference-container.sh
