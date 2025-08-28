@@ -1,12 +1,12 @@
 # Self-Service On-Prem Datalab Inference Container
 
-This repo contains scripts to pull and run Datalab's self-service on-prem container [documented here](https://documentation.datalab.to/docs/on-prem/self-serve/overview).
+This repo contains scripts to pull and run [Datalab's self-service on-prem container](https://documentation.datalab.to/docs/on-prem/self-serve/overview).
 
 If you need help troubleshooting or have questions, please reach out to [support@datalab.to](mailto:support@datalab.to).
 
-To run the container, you will need your license key. To pull images or search for tags in our registry, you will need your GCloud service account key.
-
-Both of these are available to you in your account at [https://www.datalab.to/app/subscription](https://www.datalab.to/app/subscription) after you check out.
+- To run the container, you will need your license key.
+- To pull images or search for tags in our registry, you will need your GCloud service account key.
+- Both of these are available to you in your account at [https://www.datalab.to/app/subscription](https://www.datalab.to/app/subscription) after you check out.
 
 # Prerequisites
 
@@ -56,9 +56,9 @@ This might be desirable if, e.g. you want to send requests to the machine runnin
 
 Our self-service on-prem license allows 1-to-3 running instances, each of which must stand alone. Instances beyond the first must be purchased ([details are here](https://documentation.datalab.to/docs/on-prem/self-serve/overview)).
 
-Our intent woth multiple instances is to allow customers to run instances in different environments (e.g. dev, stage, production).
+Our intent with multiple instances is to allow customers to run instances in different environments/contexts (e.g. dev, stage, production).
 
-If you want to increase concurrency by running multiple instances, a different setup and license are both required. Get in touch with us regarding a custom contract at [support@datalab.to](mailto:support@datalab.to).
+If you want to increase concurrency by running multiple instances, different images, deployment instruction, and a custom contract are required. Get in touch with us regarding a custom contract at [support@datalab.to](mailto:support@datalab.to).
 
 # Recommended GPUs
 
