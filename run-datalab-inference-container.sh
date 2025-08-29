@@ -68,7 +68,7 @@ Required Environment Variables:
 Optional Environment Variables:
     CONTAINER_VERSION           Container version tag (default: latest)
     INFERENCE_PORT              Port to run the inference server on (default: 8000)
-    INFERENCE_HOST              Host interface to bind to (default: localhost, use 0.0.0.0 for external access)
+    INFERENCE_HOST              Host interface to bind to (default: 127.0.0.1, use 0.0.0.0 for external access)
     DOCKER_EXTRA_ARGS           Additional arguments to pass to docker run
 
 Examples:
@@ -123,7 +123,7 @@ fi
 # Set default values
 CONTAINER_VERSION="${CONTAINER_VERSION:-latest}"
 INFERENCE_PORT="${INFERENCE_PORT:-8000}"
-INFERENCE_HOST="${INFERENCE_HOST:-localhost}"
+INFERENCE_HOST="${INFERENCE_HOST:-127.0.0.1}"
 DOCKER_EXTRA_ARGS="${DOCKER_EXTRA_ARGS:-}"
 
 # Container configuration
