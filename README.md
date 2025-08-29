@@ -26,6 +26,48 @@ export SERVICE_ACCOUNT_KEY_FILE=path/to/key.json
 
 The container's server runs on port 8000 by default and maps 8000 on the host by default.
 
+## Running in Background (Daemon Mode)
+
+To run the container in the background so you can log out of your VM:
+
+```bash
+export DATALAB_LICENSE_KEY=your-license-key
+export SERVICE_ACCOUNT_KEY_FILE=path/to/key.json
+./run-datalab-inference-container.sh --daemon
+```
+
+Useful commands:
+- `./run-datalab-inference-container.sh --status` - Check if container is running
+- `./run-datalab-inference-container.sh --stop` - Stop the container
+- `docker ps` - See all running containers (look for `datalab-inference`)
+
+The daemon mode automatically restarts the container if it crashes.
+
+## Health Check
+
+The container provides a health check endpoint at `/health_check` that returns `{"status": "healthy"}` when the server accepting requests is running properly.
+
+```bash
+curl http://localhost:8000/health_check
+```
+
+## Listing Available Container Versions
+
+To see what container versions are available in the registry:
+
+```bash
+export SERVICE_ACCOUNT_KEY_FILE=path/to/key.json
+./list-images.sh
+```
+
+This will show a table of available tags and their digests. You can also use:
+- `FORMAT=tags-only ./list-images.sh` - Show only the tag names
+- `FORMAT=json ./list-images.sh` - Show full JSON output
+
+Use the tag names with the `CONTAINER_VERSION` environment variable to run a specific version instead of the latest (which it runs by default).
+
+## Configuration
+
 Other environment variables you can set include:
 
 - `CONTAINER_VERSION` if you don't want to use the image tagged `:latest`.

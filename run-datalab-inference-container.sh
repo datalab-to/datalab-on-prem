@@ -7,6 +7,12 @@
 # Usage:
 #   DATALAB_LICENSE_KEY=your-key SERVICE_ACCOUNT_KEY_FILE=path/to/key.json ./run-datalab-inference-container.sh [OPTIONS]
 #
+# Options:
+#   --daemon, -d    Run in background (daemon mode)
+#   --stop          Stop running container
+#   --status        Check container status
+#   --help, -h      Show help
+#
 # Required Environment Variables:
 #   DATALAB_LICENSE_KEY          Your Datalab license key
 #   SERVICE_ACCOUNT_KEY_FILE     Path to Google Cloud service account JSON key file
@@ -61,6 +67,12 @@ This script pulls and runs the Datalab inference container for customers.
 Usage:
     DATALAB_LICENSE_KEY=your-key SERVICE_ACCOUNT_KEY_FILE=path/to/key.json ./run-datalab-inference-container.sh [OPTIONS]
 
+Options:
+    --daemon, -d    Run in background (daemon mode)
+    --stop          Stop running container  
+    --status        Check container status
+    --help, -h      Show help
+
 Required Environment Variables:
     DATALAB_LICENSE_KEY          Your Datalab license key
     SERVICE_ACCOUNT_KEY_FILE     Path to Google Cloud service account JSON key file
@@ -91,6 +103,30 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --help|-h)
             show_help
+            exit 0
+            ;;
+        --daemon|-d)
+            DAEMON_MODE=true
+            shift
+            ;;
+        --stop)
+            if docker ps | grep -q datalab-inference; then
+                print_info "Stopping Datalab inference container..."
+                docker stop datalab-inference
+                docker rm datalab-inference
+                print_success "Container stopped and removed"
+            else
+                print_warning "No running Datalab inference container found"
+            fi
+            exit 0
+            ;;
+        --status)
+            if docker ps | grep -q datalab-inference; then
+                print_success "Datalab inference container is running"
+                docker ps --filter name=datalab-inference --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+            else
+                print_info "Datalab inference container is not running"
+            fi
             exit 0
             ;;
         *)
@@ -125,6 +161,7 @@ CONTAINER_VERSION="${CONTAINER_VERSION:-latest}"
 INFERENCE_PORT="${INFERENCE_PORT:-8000}"
 INFERENCE_HOST="${INFERENCE_HOST:-127.0.0.1}"
 DOCKER_EXTRA_ARGS="${DOCKER_EXTRA_ARGS:-}"
+DAEMON_MODE="${DAEMON_MODE:-false}"
 
 # Container configuration
 REGISTRY_URL="us-docker.pkg.dev"
@@ -210,12 +247,24 @@ if [[ -n "$DATALAB_LICENSE_SERVER" ]]; then
     DOCKER_ENV_VARS="$DOCKER_ENV_VARS -e DATALAB_LICENSE_SERVER=$DATALAB_LICENSE_SERVER"
 fi
 
-DOCKER_CMD="docker run --rm -it \
-    $GPU_ARGS \
-    -p $INFERENCE_HOST:$INFERENCE_PORT:$INFERENCE_PORT \
-    $DOCKER_ENV_VARS \
-    $DOCKER_EXTRA_ARGS \
-    $FULL_IMAGE_PATH"
+# Build Docker command based on mode
+if [[ "$DAEMON_MODE" == "true" ]]; then
+    DOCKER_CMD="docker run -d \
+        --name datalab-inference \
+        --restart unless-stopped \
+        $GPU_ARGS \
+        -p $INFERENCE_HOST:$INFERENCE_PORT:$INFERENCE_PORT \
+        $DOCKER_ENV_VARS \
+        $DOCKER_EXTRA_ARGS \
+        $FULL_IMAGE_PATH"
+else
+    DOCKER_CMD="docker run --rm -it \
+        $GPU_ARGS \
+        -p $INFERENCE_HOST:$INFERENCE_PORT:$INFERENCE_PORT \
+        $DOCKER_ENV_VARS \
+        $DOCKER_EXTRA_ARGS \
+        $FULL_IMAGE_PATH"
+fi
 
 print_info "=== Starting Datalab Inference Container ==="
 if [[ "$INFERENCE_HOST" == "0.0.0.0" ]]; then
@@ -223,11 +272,46 @@ if [[ "$INFERENCE_HOST" == "0.0.0.0" ]]; then
 else
     print_info "Container will be available at: http://$INFERENCE_HOST:$INFERENCE_PORT"
 fi
-print_info "Press Ctrl+C to stop the container"
+
+if [[ "$DAEMON_MODE" == "true" ]]; then
+    print_info "Running in daemon mode (background)"
+    print_info "Use '$0 --status' to check status"
+    print_info "Use '$0 --stop' to stop the container"
+else
+    print_info "Press Ctrl+C to stop the container"
+fi
+
 echo ""
 print_info "Docker command:"
 echo "$DOCKER_CMD"
 echo ""
 
 # Run the container
-exec $DOCKER_CMD
+if [[ "$DAEMON_MODE" == "true" ]]; then
+    # Check if container is already running
+    if docker ps | grep -q datalab-inference; then
+        print_warning "Datalab inference container is already running"
+        print_info "Current container status:"
+        docker ps --filter name=datalab-inference --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+        echo ""
+        print_info "To restart the container, first stop it with: $0 --stop"
+        print_info "To check container status, use: $0 --status"
+        exit 0
+    fi
+    
+    # Clean up any stopped container with the same name
+    docker rm datalab-inference 2>/dev/null || true
+    
+    # Start new container
+    eval $DOCKER_CMD
+    
+    if docker ps | grep -q datalab-inference; then
+        print_success "Container started successfully in daemon mode"
+        print_info "Container ID: $(docker ps --filter name=datalab-inference --format '{{.ID}}')"
+    else
+        print_error "Failed to start container in daemon mode"
+        exit 1
+    fi
+else
+    exec $DOCKER_CMD
+fi
