@@ -41,7 +41,7 @@ Useful commands:
 - `./run-datalab-inference-container.sh --stop` - Stop the container
 - `docker ps` - See all running containers (look for `datalab-inference`)
 
-The daemon mode automatically restarts the container if it crashes.
+Running in daemon mode automatically restarts the container if it crashes.
 
 ## Health Check
 
@@ -72,7 +72,7 @@ Other environment variables you can set include:
 
 - `CONTAINER_VERSION` if you don't want to use the image tagged `:latest`.
 - `INFERENCE_PORT` to set the port to a value other than 8000.
-- `INFERENCE_HOST` to control which network interface the container binds to (default: `localhost` for local access only, set to `0.0.0.0` for external access).
+- `INFERENCE_HOST` to control which network interface the container binds to (default: `127.0.0.1` for local access only, set to `0.0.0.0` for external access).
 - `DOCKER_EXTRA_ARGS` to submit additional args to Docker.
 
 ## Exposing the container externally
@@ -86,7 +86,7 @@ export INFERENCE_HOST=0.0.0.0
 ./run-datalab-inference-container.sh
 ```
 
-When exposing the container externally, ensure your VM's firewall allows inbound traffic on the inference port, and consider the security implications of making the service publicly accessible in your scenario.
+When exposing the container externally, ensure your VM's firewall allows inbound traffic on the inference port, and **carefully consider the security implications of making the service publicly accessible in your scenario.**
 
 ## Using a reverse proxy
 
