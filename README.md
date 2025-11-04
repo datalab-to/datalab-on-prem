@@ -1,12 +1,11 @@
-# Self-Service On-Prem Datalab Inference Container
+# On-Prem Datalab Inference Container
 
-This repo contains scripts to pull and run [Datalab's self-service on-prem container](https://documentation.datalab.to/docs/on-prem/self-serve/overview).
+This repo contains scripts to pull and run Datalab's on-prem container, requiring a license.
 
 If you need help troubleshooting or have questions, please reach out to [support@datalab.to](mailto:support@datalab.to).
 
 - To run the container, you will need your license key.
 - To pull images or search for tags in our registry, you will need your GCloud service account key.
-- Both of these are available to you in your account at [https://www.datalab.to/app/subscription](https://www.datalab.to/app/subscription) after you check out.
 
 # Prerequisites
 
@@ -14,11 +13,40 @@ If you need help troubleshooting or have questions, please reach out to [support
 - Docker running on that VM
 - The `gcloud` CLI on the path (see [install instructions](https://cloud.google.com/sdk/docs/install))
 
+
+# Container Types
+
+Datlab offers a container for each of our models:
+
+- **`marker`** (default): Our original Marker/Surya-based inference engine. Fastest, but less accurate.
+- **`chandra-small`**: A smaller version of Chandra. A balance of accuracy and latency -- in between `marker` and `chandra`.
+- **`chandra`**: Our [latest model, which tops third-party OCR benchmarks](https://www.datalab.to/blog/introducing-chandra). Slowest, but most accurate.
+
+**NOTE**: Our self-serve option only offers `marker`. Enterprise pilots or contracts are required for `chandra-small` or `chandra`.
+
+By default, scripts use the `marker` container. To use a different model type, set the `DATALAB_MODEL` environment variable (see examples below).
+
 # Running the container
 
 You can run the container by logging into your VM and running the below:
 
 ```bash
+export DATALAB_LICENSE_KEY=your-license-key
+export SERVICE_ACCOUNT_KEY_FILE=path/to/key.json
+./run-datalab-inference-container.sh
+```
+
+This will run the default `marker` container. To run a different model type:
+
+```bash
+# Run Chandra container
+export DATALAB_MODEL=chandra
+export DATALAB_LICENSE_KEY=your-license-key
+export SERVICE_ACCOUNT_KEY_FILE=path/to/key.json
+./run-datalab-inference-container.sh
+
+# Run Chandra-small container
+export DATALAB_MODEL=chandra-small
 export DATALAB_LICENSE_KEY=your-license-key
 export SERVICE_ACCOUNT_KEY_FILE=path/to/key.json
 ./run-datalab-inference-container.sh
@@ -60,7 +88,17 @@ export SERVICE_ACCOUNT_KEY_FILE=path/to/key.json
 ./list-images.sh
 ```
 
-This will show a table of available tags and their digests. You can also use:
+This will show a table of available tags and their digests for the default `marker` container. To list versions for other model types:
+
+```bash
+# List Chandra container versions
+DATALAB_MODEL=chandra SERVICE_ACCOUNT_KEY_FILE=path/to/key.json ./list-images.sh
+
+# List Chandra-small container versions
+DATALAB_MODEL=chandra-small SERVICE_ACCOUNT_KEY_FILE=path/to/key.json ./list-images.sh
+```
+
+You can also use:
 - `FORMAT=tags-only ./list-images.sh` - Show only the tag names
 - `FORMAT=json ./list-images.sh` - Show full JSON output
 
@@ -70,6 +108,7 @@ Use the tag names with the `CONTAINER_VERSION` environment variable to run a spe
 
 Other environment variables you can set include:
 
+- `DATALAB_MODEL` to select the model type: `marker` (default), `chandra`, or `chandra-small`.
 - `CONTAINER_VERSION` if you don't want to use the image tagged `:latest`.
 - `INFERENCE_PORT` to set the port to a value other than 8000.
 - `INFERENCE_HOST` to control which network interface the container binds to (default: `127.0.0.1` for local access only, set to `0.0.0.0` for external access).
@@ -104,15 +143,24 @@ If you need concurrency across > 1 GPU, contact us regarding a custom contract a
 
 # Recommended GPUs
 
-We recommend running the container on one of these GPUs, in roughly this order:
+## Marker
+
+We recommend running Marker on one of these GPUs, in roughly this order:
 
 - H100
 - L40S
 - A10
 - T4
 
-# Tuning
+## Chandra Small
 
-The container is tuned to work well on any of the above GPUs, but we're happy to provide recommendations for your particular workloads/constraints.
+For Chandra Small, we recommend two classes of GPUs, one at the 24GB VRAM tier and the other at the 80GB VRAM tier:
 
-Send us a note at [support@datalab.to](mailto:support@datalab.to).
+- **24GB VRAM**: A10, L4
+- **80GB VRAM**: H100, A100
+
+You will get better performance out of GPUs at the 80GB VRAM tier.
+
+## Chandra
+
+For Chandra, we recommend running either an H100 or A100 with 80GB VRAM.

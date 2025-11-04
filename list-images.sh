@@ -12,10 +12,17 @@
 #
 # Optional Environment Variables:
 #   FORMAT                       Output format: table, json, or tags-only (default: table)
+#   DATALAB_MODEL                Model type: marker, chandra, or chandra-small (default: marker)
 #
 # Examples:
-#   # Basic usage - show table format
+#   # Basic usage - show table format (Marker)
 #   SERVICE_ACCOUNT_KEY_FILE=./key.json ./list-images.sh
+#
+#   # List Chandra images
+#   DATALAB_MODEL=chandra SERVICE_ACCOUNT_KEY_FILE=./key.json ./list-images.sh
+#
+#   # List Chandra-small images
+#   DATALAB_MODEL=chandra-small SERVICE_ACCOUNT_KEY_FILE=./key.json ./list-images.sh
 #
 #   # Show only tags
 #   SERVICE_ACCOUNT_KEY_FILE=./key.json FORMAT=tags-only ./list-images.sh
@@ -65,6 +72,7 @@ Required Environment Variables:
 
 Optional Environment Variables:
     FORMAT                       Output format: table, json, or tags-only (default: table)
+    DATALAB_MODEL                Model type: marker, chandra, or chandra-small (default: marker)
 
 Examples:
     # Basic usage - show table format
@@ -108,6 +116,7 @@ fi
 
 # Set default values
 FORMAT="${FORMAT:-table}"
+DATALAB_MODEL="${DATALAB_MODEL:-marker}"
 
 # Validate format
 case "$FORMAT" in
@@ -119,10 +128,26 @@ case "$FORMAT" in
         ;;
 esac
 
+# Validate model type
+case "$DATALAB_MODEL" in
+    marker)
+        REPOSITORY_NAME="datalab-inference-container"
+        ;;
+    chandra)
+        REPOSITORY_NAME="datalab-inference-container-chandra"
+        ;;
+    chandra-small)
+        REPOSITORY_NAME="datalab-inference-container-chandra-small"
+        ;;
+    *)
+        print_error "Invalid DATALAB_MODEL: $DATALAB_MODEL. Valid options: marker, chandra, chandra-small"
+        exit 1
+        ;;
+esac
+
 # Container repository configuration
 REGISTRY_URL="us-docker.pkg.dev"
 PROJECT_ID="datalab-customer-images"
-REPOSITORY_NAME="datalab-inference-container"
 IMAGE_NAME="datalab-inference"
 FULL_REPOSITORY_PATH="${REGISTRY_URL}/${PROJECT_ID}/${REPOSITORY_NAME}/${IMAGE_NAME}"
 
