@@ -22,8 +22,6 @@ Datlab offers a container for each of our models:
 - **`chandra-small`**: A smaller version of Chandra. A balance of accuracy and latency -- in between `marker` and `chandra`.
 - **`chandra`**: Our [latest model, which tops third-party OCR benchmarks](https://www.datalab.to/blog/introducing-chandra). Slowest, but most accurate.
 
-**NOTE**: Our self-serve option only offers `marker`. Enterprise pilots or contracts are required for `chandra-small` or `chandra`.
-
 By default, scripts use the `marker` container. To use a different model type, set the `DATALAB_MODEL` environment variable (see examples below).
 
 # Running the container
