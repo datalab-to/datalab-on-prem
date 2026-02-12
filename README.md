@@ -123,6 +123,7 @@ The container automatically detects available GPUs, VRAM, and model type to set 
 - `MAX_NUM_SEQS` — maximum concurrent sequences per replica. Auto-tuned based on VRAM and model type. Will auto-scale if using `TENSOR_PARALLEL_SIZE`>1
 - `MAX_NUM_BATCHED_TOKENS` — maximum tokens per batch pre replica. Auto-tuned based on VRAM. Will auto-scale if using `TENSOR_PARALLEL_SIZE`>1
 - `MAX_CONCURRENT_VLLM` — total client-side concurrency limit (default: `MAX_NUM_SEQS * DATA_PARALLEL_SIZE`).
+- `GPU_MEMORY_UTILIZATION` - % of GPU memory utilized by the model runner.
   
 ## Exposing the container externally
 
