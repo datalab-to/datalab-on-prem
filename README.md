@@ -112,6 +112,18 @@ Other environment variables you can set include:
 - `INFERENCE_HOST` to control which network interface the container binds to (default: `127.0.0.1` for local access only, set to `0.0.0.0` for external access).
 - `DOCKER_EXTRA_ARGS` to submit additional args to Docker.
 
+### GPU Configuration (Chandra and Chandra-Small only)                                                                                                                                              
+                                                                                                                                                                                                      
+The container automatically detects available GPUs, VRAM, and model type to set optimal defaults. By default, it scales to all GPUs visible to the container using data parallelism, and scales the necessary client side concurrency automatically. **You should only override these if you know what you're doing.**                                                                                                                                                              
+
+> **Note:** The container can only use GPUs that are exposed to it. Use `--gpus all` (or `--gpus device=0,1,2` for specific GPUs) when running the container.
+
+- `TENSOR_PARALLEL_SIZE` — number of GPUs to split a single model across (default: `1`).
+- `DATA_PARALLEL_SIZE` — number of model replicas to run in parallel (default: `NUM_GPUS / TENSOR_PARALLEL_SIZE`).
+- `MAX_NUM_SEQS` — maximum concurrent sequences per replica. Auto-tuned based on VRAM and model type. Will auto-scale if using `TENSOR_PARALLEL_SIZE`>1
+- `MAX_NUM_BATCHED_TOKENS` — maximum tokens per batch pre replica. Auto-tuned based on VRAM. Will auto-scale if using `TENSOR_PARALLEL_SIZE`>1
+- `MAX_CONCURRENT_VLLM` — total client-side concurrency limit (default: `MAX_NUM_SEQS * DATA_PARALLEL_SIZE`).
+  
 ## Exposing the container externally
 
 By default, the container is only accessible from the local machine. To make it accessible from external networks:
@@ -137,7 +149,7 @@ Our self-service on-prem license allows 1-to-3 running instances, each of which 
 
 Our intent with multiple instances is to allow customers to run instances in different environments/contexts (e.g. dev, stage, production).
 
-If you need concurrency across > 1 GPU, contact us regarding a custom contract at [support@datalab.to](mailto:support@datalab.to). In addition to a new license, different images and deployment instructions are also required for such a set up.
+If you need more instances, contact us regarding a custom contract at [support@datalab.to](mailto:support@datalab.to). In addition to a new license, different images and deployment instructions are also required for such a set up.
 
 # Recommended GPUs
 
@@ -161,4 +173,4 @@ You will get better performance out of GPUs at the 80GB VRAM tier.
 
 ## Chandra
 
-For Chandra, we recommend running either an H100 or A100 with 80GB VRAM.
+For Chandra, we recommend running either of - B200, H200, H100, A100.
