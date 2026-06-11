@@ -18,7 +18,7 @@
 #   SERVICE_ACCOUNT_KEY_FILE     Path to Google Cloud service account JSON key file
 #
 # Optional Environment Variables:
-#   DATALAB_MODEL               Model type: marker, chandra, or chandra-small (default: marker)
+#   DATALAB_MODEL               Model type: marker, chandra, chandra-small, or chandra-nolicense (default: marker)
 #   CONTAINER_VERSION           Container version tag (default: latest)
 #   INFERENCE_PORT              Port to run the inference server on (default: 8000)
 #   INFERENCE_HOST              Host interface to bind to (default: localhost, use 0.0.0.0 for external access)
@@ -33,6 +33,9 @@
 #
 #   # Run Chandra-small container
 #   DATALAB_MODEL=chandra-small DATALAB_LICENSE_KEY=ABC123 SERVICE_ACCOUNT_KEY_FILE=./key.json ./run-datalab-inference-container.sh
+#
+#   # Run Chandra-nolicense container
+#   DATALAB_MODEL=chandra-nolicense DATALAB_LICENSE_KEY=ABC123 SERVICE_ACCOUNT_KEY_FILE=./key.json ./run-datalab-inference-container.sh
 #
 #   # With custom port and version
 #   DATALAB_LICENSE_KEY=ABC123 SERVICE_ACCOUNT_KEY_FILE=./key.json INFERENCE_PORT=8001 CONTAINER_VERSION=v1.0.0 ./run-datalab-inference-container.sh
@@ -85,7 +88,7 @@ Required Environment Variables:
     SERVICE_ACCOUNT_KEY_FILE     Path to Google Cloud service account JSON key file
 
 Optional Environment Variables:
-    DATALAB_MODEL               Model type: marker, chandra, or chandra-small (default: marker)
+    DATALAB_MODEL               Model type: marker, chandra, chandra-small, or chandra-nolicense (default: marker)
     CONTAINER_VERSION           Container version tag (default: latest)
     INFERENCE_PORT              Port to run the inference server on (default: 8000)
     INFERENCE_HOST              Host interface to bind to (default: 127.0.0.1, use 0.0.0.0 for external access)
@@ -100,6 +103,9 @@ Examples:
 
     # Run Chandra-small container
     DATALAB_MODEL=chandra-small DATALAB_LICENSE_KEY=ABC123 SERVICE_ACCOUNT_KEY_FILE=./key.json ./run-datalab-inference-container.sh
+
+    # Run Chandra-nolicense container
+    DATALAB_MODEL=chandra-nolicense DATALAB_LICENSE_KEY=ABC123 SERVICE_ACCOUNT_KEY_FILE=./key.json ./run-datalab-inference-container.sh
 
     # With custom port and version
     DATALAB_LICENSE_KEY=ABC123 SERVICE_ACCOUNT_KEY_FILE=./key.json INFERENCE_PORT=8001 CONTAINER_VERSION=v1.0.0 ./run-datalab-inference-container.sh
@@ -189,8 +195,11 @@ case "$DATALAB_MODEL" in
     chandra-small)
         REPOSITORY_NAME="datalab-inference-container-chandra-small"
         ;;
+    chandra-nolicense)
+        REPOSITORY_NAME="datalab-inference-container-chandra-nolicense"
+        ;;
     *)
-        print_error "Invalid DATALAB_MODEL: $DATALAB_MODEL. Valid options: marker, chandra, chandra-small"
+        print_error "Invalid DATALAB_MODEL: $DATALAB_MODEL. Valid options: marker, chandra, chandra-small, chandra-nolicense"
         exit 1
         ;;
 esac
